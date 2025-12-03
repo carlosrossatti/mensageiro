@@ -1,0 +1,35 @@
+name: Auto Bot - Superset para Slack
+
+on:
+  schedule:
+    # Exemplo: roda todo dia útil às 08:00 BRT (~11:00 UTC)
+    - cron: "0 11 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run bot (Superset -> Slack)
+        env:
+          SUPERSET_URL: ${{ secrets.SUPERSET_URL }}
+          SUPERSET_USER: ${{ secrets.SUPERSET_USER }}
+          SUPERSET_PASSWORD: ${{ secrets.SUPERSET_PASSWORD }}
+          SUPERSET_CHART_ID: ${{ secrets.SUPERSET_CHART_ID }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          python bot_superset_slack.py
